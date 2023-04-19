@@ -1,7 +1,5 @@
 FROM alpine:latest
 
-USER root
-
 RUN apk add --no-cache skopeo python3-dev python3 py3-pip
 
 # Create app directory
