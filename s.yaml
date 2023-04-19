@@ -1,0 +1,39 @@
+edition: 1.0.0           #  命令行YAML规范版本，遵循语义化版本（Semantic Versioning）规范
+name: vaultwarden-alicloud           #  项目名称
+access: default        #  秘钥别名
+
+vars: # 全局变量
+  region: "ap-southeast-1"
+  service:
+    name: "fc-kaniko"
+    description: 'use kaniko build and push image run in FC'
+    role: "acs:ram::1720008599178925:role/aliyunfcdefaultrole"
+    internetAccess: true
+  functionName: "builder"
+
+services:
+  vaultwarden: # 模块名称
+    component: devsapp/fc # 组件名称
+    actions:          # 自定义执行逻辑，关于actions 的使用，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#行为描述
+      pre-deploy:  # 在deploy之前运行
+        - component: fc build --use-docker --dockerfile ./code/Dockerfile 
+    props: # 组件的属性值
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: ${vars.functionName}
+        runtime: custom-container
+        codeUri: ./code
+        memorySize: 3072
+        timeout: 3600
+        customContainerConfig:
+          image: registry-vpc.${vars.region}.aliyuncs.com/miaou/skopeo:v0.1
+        environmentVariables:
+          TZ: "Asia/Shanghai"
+      triggers:
+        - name: httpTrigger
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - POST
