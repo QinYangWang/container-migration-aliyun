@@ -2,6 +2,9 @@ FROM alpine:latest
 
 RUN apk add --no-cache skopeo python3-dev python3 py3-pip
 
+# Tell docker that all future commands should run as the appuser user
+USER root
+
 # Create app directory
 RUN mkdir -p /skopeo/app
 WORKDIR /skopeo/app
