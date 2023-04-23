@@ -27,11 +27,9 @@ def is_acr_image(registry):
     return registry.startswith('registry') and registry.endswith('.aliyuncs.com')
 
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/", methods=['POST'])
 def build_image():
 
-    rid = request.headers.get(REQUEST_ID_HEADER)
-    print('FC Invoke Start RequestId: {}'.format(rid))
     data = request.stream.read()
     try:
         evt = json.loads(data)
@@ -68,7 +66,7 @@ def build_image():
             else:
                 raise Exception("Only ACR can not pass usr and pwd")
 
-        cmdStr = 'skopeo copy --dest-creds={}:{} docker://{}/{} docker://{}/{}/{}'.format(usr, pwd, url, image, registry, repo, image)
+        cmdStr = 'skopeo copy --dest-creds={}:{} docker://{}/{} docker://{}/{}/{}'.format(usr, pwd, url, image, registry, repo, image.split('/')[1])
         print(cmdStr)
         subprocess.check_call(cmdStr, shell=True)
 
@@ -79,12 +77,8 @@ def build_image():
             "message": str(e),
             "stack": trace
         }
-        print("FC Invoke End RequestId: " + rid +
-              ", Error: Unhandled function error")
         print(errRet)
         return errRet, 404, [("x-fc-status", "404")]
-
-    print('FC Invoke End RequestId: {}'.format(rid))
     return "OK"
 
 
