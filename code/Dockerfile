@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 python:3.8-alpine 
+FROM --platform=linux/amd64 python:alpine 
 
 RUN apk add --no-cache skopeo
 # Create app directory
