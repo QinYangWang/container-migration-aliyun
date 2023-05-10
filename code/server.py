@@ -9,8 +9,6 @@ import json
 import sys
 import traceback
 import logging
-import base64
-import os
 
 
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
